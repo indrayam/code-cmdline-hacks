@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Bash function to setup SSH key pair files in BitBucket
+# Bash function to setup SSH key pair files in Bitbucket
 function configure_ssh_keys () {
     SSHKEY_PUB_CONTENT=`cat $SSHKEY_PUB`
     echo "SSH Public Key:"
     echo "$SSHKEY_PUB_CONTENT"
 
-    # Create BitBucket API payload
+    # Create Bitbucket API payload
     PAYLOAD_FILE="/tmp/a.json"
     cat > $PAYLOAD_FILE <<- EOF
     {
@@ -17,11 +17,11 @@ EOF
     echo "API Payload Content:"
     echo "$API_PAYLOAD_CONTENT"
 
-    # Upload the key to BitBucket
+    # Upload the key to Bitbucket
     read -p "CEC ID: " CECID
     read -sp "CEC Password: " CECPASSWD
     GIT_API_URL="https://gitscm.cisco.com/rest/ssh/1.0/keys?user=$CECID"
-    echo "Ready to upload the SSH Public Key to BitBucket..."
+    echo "Ready to upload the SSH Public Key to Bitbucket..."
     curl --user "$CECID:$CECPASSWD" -H "Content-Type: application/json" --data @${PAYLOAD_FILE} -X POST ${GIT_API_URL}
 }
 
@@ -33,23 +33,23 @@ echo "Private key file name set to $SSHKEY"
 SSHKEY_PUB="${SSHKEY}.pub"
 echo "Public key file name set to $SSHKEY_PUB"
 
-# Check if the user's SSH key is already configured in our BitBucket server (gitscm.cisco.com)
+# Check if the user's SSH key is already configured in our Bitbucket server (gitscm.cisco.com)
 ssh -v git@gitscm.cisco.com 2>&1 | grep -i succeeded
 GIT_STATUS=`echo $?`
 
-# If SSH keys are already configured in BitBucket...
-#...If SSH Public Key file exists but not configured in BitBucket
+# If SSH keys are already configured in Bitbucket...
+#...If SSH Public Key file exists but not configured in Bitbucket
 #...If neither
 if [[ $GIT_STATUS -eq 0 ]]
 then
-  echo "Your SSH key pair files are already configured in BitBucket. You're all set!"
+  echo "Your SSH key pair files are already configured in Bitbucket. You're all set!"
 elif [[ -f $SSHKEY_PUB ]]
 then
-    echo "It seems like your SSH key pair files are not configured on BitBucket"
+    echo "It seems like your SSH key pair files are not configured on Bitbucket"
     echo "$SSHKEY_PUB exists"
     configure_ssh_keys
 else
-    echo "Since you have no $SSHKEY_PUB, you are not setup to use SSH Keys to authenticae on BitBucket.." 
+    echo "Since you have no $SSHKEY_PUB, you are not setup to use SSH Keys to authenticate on Bitbucket.." 
     echo "Creating a SSH key pair.."
     ssh-keygen -q -t rsa -N '' -f ${SSHKEY}
     configure_ssh_keys
