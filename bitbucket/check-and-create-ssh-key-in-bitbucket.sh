@@ -23,6 +23,9 @@ EOF
     GIT_API_URL="https://gitscm.cisco.com/rest/ssh/1.0/keys?user=$CECID"
     echo "Ready to upload the SSH Public Key to Bitbucket..."
     curl --user "$CECID:$CECPASSWD" -H "Content-Type: application/json" --data @${PAYLOAD_FILE} -X POST ${GIT_API_URL}
+    echo
+    echo "Note:"
+    echo "If you see 'This SSH key is already assigned..' exception message, ignore. If you did not, good for you. Either way, you're all set!"
 }
 
 
@@ -42,7 +45,10 @@ GIT_STATUS=`echo $?`
 #...If neither
 if [[ $GIT_STATUS -eq 0 ]]
 then
-  echo "Your SSH key pair files are already configured in Bitbucket. You're all set!"
+  echo "Your SSH key pair files are already configured in Bitbucket. You seem to be all set!"
+  echo "However, sometimes SSH keys are assigned at Repo level that might give an inaccurate result"
+  echo "Will try to upload your existing SSH keys one more time..."
+  configure_ssh_keys
 elif [[ -f $SSHKEY_PUB ]]
 then
     echo "It seems like your SSH key pair files are not configured on Bitbucket"
